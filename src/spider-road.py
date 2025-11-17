@@ -11,25 +11,32 @@ from spider_lcd.exceptions import APIError
 from spider_lcd.utils import format_json
 import os
 from dotenv import load_dotenv
+import time
 
 
 def main():
     """Simple example of making a GET request."""
-   
-    try:
-        # Create API client
-        load_dotenv()
 
-        client = APIClient(
-            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
-            timeout=10
-        )
+    # Create API client
+    client = APIClient(
+        base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+        timeout=10
+    )
+    
+    try:
+        while True:
+            get_traffic_info(client)
+            time.sleep(30)
+    except KeyboardInterrupt:
+        print("Avslutar...")
         
-        # Make a GET request
+def get_traffic_info(client):
+    """Get and display traffic information."""
+    try:
+    # Make a GET request
         response = client.get(f"/traffic/{os.getenv('DIRECTION', 'gullmarsplan')}")
         
         if response.success:
-
             nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
             designation = response.get_data("departure.route.designation", "N/A")
             direction = response.get_data("departure.route.direction", "N/A")
@@ -37,7 +44,7 @@ def main():
             print(f"Linje: {designation}")
             print(f"Mot: {direction}")
             print(f"Om: {nextDepartureIn}")
-        
+
     except APIError as e:
         print(f"Error: {e}")
         if e.status_code:
@@ -45,4 +52,5 @@ def main():
     
    
 if __name__ == "__main__":
+    load_dotenv()
     main()
