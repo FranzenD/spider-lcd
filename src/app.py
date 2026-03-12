@@ -19,16 +19,20 @@ lcd = LCDDisplay()
 def format_departure_time(value: str) -> str:
     """Return 'Nu!' if the departure is less than one minute away.
 
-    Handles numeric strings like '0', '0 min', or plain integers/floats.
+    Handles numeric strings like '0', '0 min', plain integers/floats,
+    and the API returning 'Nu' directly.
     Returns the original value unchanged for all other cases.
     """
+    raw = str(value).strip()
+    if raw.lower() == "nu":
+        return "Nu!"
     try:
-        minutes = float(str(value).split()[0])
+        minutes = float(raw.split()[0])
         if minutes < 1:
             return "Nu!"
     except (ValueError, IndexError):
         pass
-    return str(value)
+    return raw
 
 
 async def main():
