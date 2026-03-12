@@ -83,6 +83,13 @@ class LCDDisplay:
             return
         self._lcd.clear()
 
+    def destroy(self) -> None:
+        """Clear the LCD screen and turn off the backlight."""
+        if not self._available:
+            return
+        self._lcd.clear()
+        self._mcp.output(3, 0)  # turn off backlight
+
     def _connect_mcp(self) -> Optional[object]:
         """Try to connect to PCF8574 at known I2C addresses.
 

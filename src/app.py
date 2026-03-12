@@ -47,7 +47,7 @@ async def main():
     except KeyboardInterrupt:
         print("Avslutar...")
     finally:
-        lcd.clear()
+        lcd.destroy()
 
         
 async def get_traffic_info(client):
