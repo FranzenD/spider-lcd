@@ -20,18 +20,19 @@ async def main():
     """Simple example of making an async GET request."""
     lcd.setup()
 
-    # Create async API client
-    async with AsyncAPIClient(
-        base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
-        timeout=10
-    ) as client:
-        try:
+    try:
+        # Create async API client
+        async with AsyncAPIClient(
+            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+            timeout=10
+        ) as client:
             while True:
                 await get_traffic_info(client)
                 await asyncio.sleep(30)
-        except KeyboardInterrupt:
-            print("Avslutar...")
-            lcd.clear()
+    except KeyboardInterrupt:
+        print("Avslutar...")
+    finally:
+        lcd.clear()
 
         
 async def get_traffic_info(client):

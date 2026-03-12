@@ -92,6 +92,7 @@ class LCDDisplay:
         for address in (_PCF8574T_ADDRESS, _PCF8574AT_ADDRESS):
             try:
                 return PCF8574_GPIO(address)
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to connect to I2C address {hex(address)}: {e}")
                 continue
         return None
