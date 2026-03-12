@@ -16,6 +16,21 @@ import asyncio
 lcd = LCDDisplay()
 
 
+def format_departure_time(value: str) -> str:
+    """Return 'Nu!' if the departure is less than one minute away.
+
+    Handles numeric strings like '0', '0 min', or plain integers/floats.
+    Returns the original value unchanged for all other cases.
+    """
+    try:
+        minutes = float(str(value).split()[0])
+        if minutes < 1:
+            return "Nu!"
+    except (ValueError, IndexError):
+        pass
+    return str(value)
+
+
 async def main():
     """Simple example of making an async GET request."""
     lcd.setup()
@@ -42,7 +57,9 @@ async def get_traffic_info(client):
         response = await client.get(f"/traffic/{os.getenv('DIRECTION', 'gullmarsplan')}")
         
         if response.success:
-            nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
+            nextDepartureIn = format_departure_time(
+                response.get_data("departure.nextDepartureIn", "N/A")
+            )
             designation = response.get_data("departure.route.designation", "N/A")
             direction = response.get_data("departure.route.direction", "N/A")
             
