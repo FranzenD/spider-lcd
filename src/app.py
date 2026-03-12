@@ -46,9 +46,10 @@ async def get_traffic_info(client):
             designation = response.get_data("departure.route.designation", "N/A")
             direction = response.get_data("departure.route.direction", "N/A")
             
+            departure_label = nextDepartureIn if str(nextDepartureIn).strip().lower() == "nu" else f"Om: {nextDepartureIn}"
             print(f"Linje: {designation}")
             print(f"Mot: {direction}")
-            print(nextDepartureIn)
+            print(departure_label)
 
             lcd.show(direction, nextDepartureIn)
 

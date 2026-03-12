@@ -70,7 +70,8 @@ class LCDDisplay:
             return
 
         row1 = direction[:_LCD_MAX_COLS]
-        row2 = next_departure_in[:_LCD_MAX_COLS]
+        row2 = (next_departure_in if next_departure_in.strip().lower() == "nu"
+                else f"Om: {next_departure_in}")[:_LCD_MAX_COLS]
 
         self._lcd.setCursor(0, 0)
         self._lcd.message(row1.ljust(_LCD_MAX_COLS))
