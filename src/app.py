@@ -3,18 +3,22 @@
 import sys
 from pathlib import Path
 
-# Add src directory to path so we can import spider_lcd
+# Add src directory to path so we can import spider_lcd and lcd_display
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from spider_lcd import AsyncAPIClient
 from spider_lcd.exceptions import APIError
+from lcd_display import LCDDisplay
 import os
 from dotenv import load_dotenv
 import asyncio
 
+lcd = LCDDisplay()
+
 
 async def main():
     """Simple example of making an async GET request."""
+    lcd.setup()
 
     # Create async API client
     async with AsyncAPIClient(
@@ -27,6 +31,8 @@ async def main():
                 await asyncio.sleep(30)
         except KeyboardInterrupt:
             print("Avslutar...")
+            lcd.clear()
+
         
 async def get_traffic_info(client):
     """Get and display traffic information."""
@@ -42,6 +48,8 @@ async def get_traffic_info(client):
             print(f"Linje: {designation}")
             print(f"Mot: {direction}")
             print(f"Om: {nextDepartureIn}")
+
+            lcd.show(direction, nextDepartureIn)
 
     except APIError as e:
         print(f"Error: {e}")
