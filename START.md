@@ -1,43 +1,43 @@
-# 🚀 Starta Spider LCD App
+# 🚀 Start Spider LCD App
 
-## Snabbstart
+## Quick Start
 
 ```bash
 ./start.sh
 ```
 
-Detta skript kommer att:
-1. Aktivera virtual environment (`.venv`)
-2. Installera nödvändiga beroenden
-3. Starta `app.py`
+This script will:
+1. Activate virtual environment (`.venv`)
+2. Install required dependencies
+3. Start `app.py`
 
-## Miljövariabler (valfritt)
+## Environment Variables (optional)
 
-Du kan skapa en `.env`-fil i projektroten med följande variabler:
+You can create a `.env` file in the project root with the following variables:
 
 ```bash
-API_BASE_URL=http://localhost:3005/api  # API:s basadress
-POLL_INTERVAL=30                         # Hur ofta appen hämtar data (sekunder)
-DIRECTION=gullmarsplan                   # T-banestationsnamn
+API_BASE_URL=http://localhost:3005/api  # API base address
+POLL_INTERVAL=30                         # How often app fetches data (seconds)
+DIRECTION=gullmarsplan                   # T-bank station name
 ```
 
-Om du inte anger `.env` använder skriptet default-värden.
+If you don't specify `.env`, the script uses default values.
 
-## Manuellt start
+## Manual start
 
-Om du vill starta manuellt:
+If you want to start manually:
 
 ```bash
-# Aktivera venv
+# Activate venv
 source .venv/bin/activate
 
-# Installera beroenden
+# Install dependencies
 pip install -r requirements.txt
 
-# Starta appen
+# Start app
 python src/app.py
 ```
 
-## Stoppa appen
+## Stop app
 
-Tryck `Ctrl+C` i terminalen för att stoppa appen.
+Press `Ctrl+C` in the terminal to stop the app.
