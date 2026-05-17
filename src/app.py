@@ -10,8 +10,12 @@ from dotenv import load_dotenv
 from spider_lcd import AsyncAPIClient
 from spider_lcd.exceptions import APIError
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging to log to a file with INFO level and a specific format
+logging.basicConfig(
+    filename='app.log',  # File name for the log file
+    level=logging.INFO,   # Minimum logging level
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Format for log messages
+)
 logger = logging.getLogger(__name__)
 
 # Add src directory to path so we can import spider_lcd
