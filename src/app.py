@@ -57,7 +57,7 @@ async def main() -> None:
                 await get_traffic_info(client)
                 await asyncio.sleep(poll_interval)
         except KeyboardInterrupt:
-            logger.info("Avslutar...")
+            logger.info("Exiting...")
 
 
 if __name__ == "__main__":
