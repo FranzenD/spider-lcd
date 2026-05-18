@@ -46,7 +46,13 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
 
 async def main() -> None:
     """Main entry point - polls traffic info periodically."""
-    poll_interval = int(os.getenv("POLL_INTERVAL", "30"))
+    try:
+        poll_interval = int(os.getenv("POLL_INTERVAL", "30"))
+        if poll_interval <= 0:
+            raise ValueError("POLL_INTERVAL must be greater than zero")
+    except ValueError as e:
+        logger.error("Invalid POLL_INTERVAL: %s", e)
+        return
 
     async with AsyncAPIClient(
         base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
