@@ -1,6 +1,7 @@
 """Simple example of using the Spider LCD API client."""
 
 import sys
+import argparse
 from pathlib import Path
 
 # Add src directory to path so we can import spider_lcd and lcd_display
@@ -14,7 +15,9 @@ from dotenv import load_dotenv
 import asyncio
 
 lcd = LCDDisplay()
-
+parser = argparse.ArgumentParser()
+parser.add_argument("-v", "--verbose", action="store_true", help="Visa mer detaljerad output")
+args = parser.parse_args()
 
 async def main():
     """Simple example of making an async GET request."""
@@ -47,9 +50,10 @@ async def get_traffic_info(client):
             direction = response.get_data("departure.route.direction", "N/A")
             
             departure_label = nextDepartureIn if str(nextDepartureIn).strip().lower() == "nu" else f"Om: {nextDepartureIn}"
-            print(f"Linje: {designation}")
-            print(f"Mot: {direction}")
-            print(departure_label)
+            if args.verbose:
+                print(f"Linje: {designation}")
+                print(f"Mot: {direction}")
+                print(departure_label)
 
             lcd.show(direction, nextDepartureIn)
 
