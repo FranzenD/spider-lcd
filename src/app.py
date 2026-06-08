@@ -42,7 +42,8 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
 
     except APIError as e:
         logger.error("API Error: %s (Status: %s)", e, e.status_code)
-
+    except Exception as e:
+        logger.error("Unexpected error in get_traffic_info: %s", e)
 
 async def main() -> None:
     """Main entry point - polls traffic info periodically."""
@@ -54,16 +55,19 @@ async def main() -> None:
         logger.error("Invalid POLL_INTERVAL: %s", e)
         return
 
-    async with AsyncAPIClient(
-        base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
-        timeout=10
-    ) as client:
-        try:
-            while True:
-                await get_traffic_info(client)
-                await asyncio.sleep(poll_interval)
-        except KeyboardInterrupt:
-            logger.info("Exiting...")
+    try:
+        async with AsyncAPIClient(
+            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+            timeout=10
+        ) as client:
+            try:
+                while True:
+                    await get_traffic_info(client)
+                    await asyncio.sleep(poll_interval)
+            except KeyboardInterrupt:
+                logger.info("Exiting...")
+    except Exception as e:
+        logger.critical("Failed to initialize or run API client: %s", e)
 
 
 if __name__ == "__main__":
