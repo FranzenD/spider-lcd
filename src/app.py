@@ -78,4 +78,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received, shutting down...")
     except Exception:
-        logger.exception("Unhandled exception in main")
+        logger.exception("Unhandled exception in main.")
