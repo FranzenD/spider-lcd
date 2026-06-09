@@ -74,7 +74,8 @@ if __name__ == "__main__":
     load_dotenv(".env")
     try:
         asyncio.run(main())
+        logger.info("Application finished gracefully.")
     except KeyboardInterrupt:
-        logger.info("KeyboardInterrupt received, shutting down")
+        logger.info("KeyboardInterrupt received, shutting down...")
     except Exception:
         logger.exception("Unhandled exception in main")
