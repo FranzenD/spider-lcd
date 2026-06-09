@@ -1,32 +1,42 @@
 """Simple example of using the Spider LCD API client."""
 
 import sys
+import argparse
 from pathlib import Path
 
-# Add src directory to path so we can import spider_lcd
+# Add src directory to path so we can import spider_lcd and lcd_display
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from spider_lcd import AsyncAPIClient
 from spider_lcd.exceptions import APIError
+from lcd_display import LCDDisplay
 import os
 from dotenv import load_dotenv
 import asyncio
 
+lcd = LCDDisplay()
+parser = argparse.ArgumentParser()
+parser.add_argument("-v", "--verbose", action="store_true", help="Visa mer detaljerad output")
+args = parser.parse_args()
 
 async def main():
     """Simple example of making an async GET request."""
+    lcd.setup()
 
-    # Create async API client
-    async with AsyncAPIClient(
-        base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
-        timeout=10
-    ) as client:
-        try:
+    try:
+        # Create async API client
+        async with AsyncAPIClient(
+            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+            timeout=10
+        ) as client:
             while True:
                 await get_traffic_info(client)
                 await asyncio.sleep(30)
-        except KeyboardInterrupt:
-            print("Avslutar...")
+    except KeyboardInterrupt:
+        print("Avslutar...")
+    finally:
+        lcd.destroy()
+
         
 async def get_traffic_info(client):
     """Get and display traffic information."""
@@ -39,9 +49,13 @@ async def get_traffic_info(client):
             designation = response.get_data("departure.route.designation", "N/A")
             direction = response.get_data("departure.route.direction", "N/A")
             
-            print(f"Linje: {designation}")
-            print(f"Mot: {direction}")
-            print(f"Om: {nextDepartureIn}")
+            departure_label = nextDepartureIn if str(nextDepartureIn).strip().lower() == "nu" else f"Om: {nextDepartureIn}"
+            if args.verbose:
+                print(f"Linje: {designation}")
+                print(f"Mot: {direction}")
+                print(departure_label)
+
+            lcd.show(direction, nextDepartureIn)
 
     except APIError as e:
         print(f"Error: {e}")

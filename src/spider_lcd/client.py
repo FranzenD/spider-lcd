@@ -110,6 +110,6 @@ class APIClient:
             )
             return self._handle_response(response)
             
-        except Exception as e:
+        except requests.RequestException as e:
             logger.error(f"Request failed: {e}")
             raise APIError(f"Request failed: {str(e)}")

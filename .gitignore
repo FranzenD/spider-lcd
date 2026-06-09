@@ -1,3 +1,7 @@
+# LCD modules (downloaded via setup_lcd.sh, not committed to git)
+src/PCF8574.py
+src/Adafruit_LCD1602.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
