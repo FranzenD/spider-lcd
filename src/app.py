@@ -1,52 +1,52 @@
-"""Simple example of using the Spider LCD API client."""
-
 import asyncio
 import logging
 import os
-import sys
+import signal
 from pathlib import Path
 
 from dotenv import load_dotenv
 from spider_lcd import AsyncAPIClient
 from spider_lcd.exceptions import APIError
 
-# Configure logging to log to a file with INFO level and a specific format
-logging.basicConfig(
-    filename='app.log',  # File name for the log file
-    level=logging.INFO,   # Minimum logging level
-    format='%(asctime)s - %(levelname)s - %(message)s'  # Format for log messages
-)
+logging.basicConfig(filename='app.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Add src directory to path so we can import spider_lcd
-sys.path.insert(0, str(Path(__file__).parent))
-
-
 async def get_traffic_info(client: AsyncAPIClient) -> None:
-    """Get and display traffic information."""
     direction = os.getenv("DIRECTION", "gullmarsplan")
-
     try:
         response = await client.get(f"/traffic/{direction}")
-
         if response.success:
-            next_departure_in = response.get_data("departure.nextDepartureIn", "N/A")
             designation = response.get_data("departure.route.designation", "N/A")
             route_direction = response.get_data("departure.route.direction", "N/A")
+            next_departure_in = response.get_data("departure.nextDepartureIn", "N/A")
 
             logger.info("Linje: %s", designation)
             logger.info("Mot: %s", route_direction)
             logger.info("Om: %s", next_departure_in)
         else:
             logger.warning("Response was not successful for %s", direction)
-
     except APIError as e:
-        logger.error("API Error: %s (Status: %s)", e, e.status_code)
-    except Exception as e:
-        logger.error("Unexpected error in get_traffic_info: %s", e)
+        logger.error("API Error: %s (Status: %s)", e, getattr(e, "status_code", "N/A"))
+    except Exception:
+        logger.exception("Unexpected error in get_traffic_info")
+
+def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event):
+    try:
+        loop.add_signal_handler(signal.SIGINT, stop_event.set)
+        loop.add_signal_handler(signal.SIGTERM, stop_event.set)
+    except NotImplementedError:
+        # Windows eller annan loop som inte stödjer add_signal_handler
+        signal.signal(signal.SIGINT, lambda *_: stop_event.set())
+        signal.signal(signal.SIGTERM, lambda *_: stop_event.set())
 
 async def main() -> None:
-    """Main entry point - polls traffic info periodically."""
+    stop_event = asyncio.Event()
+
+    # Registrera signalhanterare när vi har en körande loop
+    loop = asyncio.get_running_loop()
+    _setup_signal_handlers_for_loop(loop, stop_event)
+
     try:
         poll_interval = int(os.getenv("POLL_INTERVAL", "30"))
         if poll_interval <= 0:
@@ -60,16 +60,21 @@ async def main() -> None:
             base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
             timeout=10
         ) as client:
-            try:
-                while True:
-                    await get_traffic_info(client)
-                    await asyncio.sleep(poll_interval)
-            except KeyboardInterrupt:
-                logger.info("Exiting...")
-    except Exception as e:
-        logger.critical("Failed to initialize or run API client: %s", e)
-
+            while not stop_event.is_set():
+                await get_traffic_info(client)
+                # Vänta antingen tills stop_event sätts eller tills timeout (poll_interval)
+                try:
+                    await asyncio.wait_for(stop_event.wait(), timeout=poll_interval)
+                except asyncio.TimeoutError:
+                    pass
+    except Exception:
+        logger.exception("Failed to initialize or run API client")
 
 if __name__ == "__main__":
     load_dotenv(".env")
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("KeyboardInterrupt received, shutting down")
+    except Exception:
+        logger.exception("Unhandled exception in main")
