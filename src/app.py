@@ -7,10 +7,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from spider_lcd import AsyncAPIClient
 from spider_lcd.exceptions import APIError
+from lcd_display import LCDDisplay
 
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+lcd = LCDDisplay()
 
 async def get_traffic_info(client: AsyncAPIClient) -> None:
     direction = os.getenv("DIRECTION", "gullmarsplan")
@@ -24,6 +26,8 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
             logger.info("Linje: %s", designation)
             logger.info("Mot: %s", route_direction)
             logger.info("Om: %s", next_departure_in)
+
+            lcd.show(direction, next_departure_in)
         else:
             logger.warning("Response was not successful for %s", direction)
     except APIError as e:
@@ -41,6 +45,7 @@ def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event:
         signal.signal(signal.SIGTERM, lambda *_: stop_event.set())
 
 async def main() -> None:
+    lcd.setup()
     stop_event = asyncio.Event()
 
     # Register signal handlers when we have a running loop
@@ -80,3 +85,6 @@ if __name__ == "__main__":
         logger.info("KeyboardInterrupt received, shutting down...")
     except Exception:
         logger.exception("Unhandled exception in main.")
+    finally:
+        lcd.destroy()
+        logger.info("LCD display cleaned up.")
