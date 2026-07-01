@@ -27,7 +27,7 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
             logger.info("Mot: %s", route_direction)
             logger.info("Om: %s", next_departure_in)
 
-            lcd.show(direction, next_departure_in)
+            lcd.show(route_direction, next_departure_in)
         else:
             logger.warning("Response was not successful for %s", direction)
     except APIError as e:
