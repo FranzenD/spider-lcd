@@ -29,7 +29,7 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
     except APIError as e:
         logger.error("API Error: %s (Status: %s)", e, getattr(e, "status_code", "N/A"))
     except Exception:
-        logger.exception("Unexpected error in get_traffic_info")
+        logger.exception("Unexpected error in get_traffic_info for direction %s", direction)
 
 def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event):
     try:
@@ -50,10 +50,11 @@ async def main() -> None:
     try:
         poll_interval = int(os.getenv("POLL_INTERVAL", "30"))
         if poll_interval <= 0:
-            raise ValueError("POLL_INTERVAL must be greater than zero")
-    except ValueError as e:
-        logger.error("Invalid POLL_INTERVAL: %s", e)
-        return
+            logger.warning("POLL_INTERVAL must be greater than zero. Using default: 30")
+            poll_interval = 30
+    except ValueError:
+        logger.warning("Invalid POLL_INTERVAL format. Using default: 30")
+        poll_interval = 30
 
     try:
         async with AsyncAPIClient(
