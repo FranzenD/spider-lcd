@@ -36,14 +36,14 @@ def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event:
         loop.add_signal_handler(signal.SIGINT, stop_event.set)
         loop.add_signal_handler(signal.SIGTERM, stop_event.set)
     except NotImplementedError:
-        # Windows eller annan loop som inte stödjer add_signal_handler
+        # Windows or other loop that does not support add_signal_handler
         signal.signal(signal.SIGINT, lambda *_: stop_event.set())
         signal.signal(signal.SIGTERM, lambda *_: stop_event.set())
 
 async def main() -> None:
     stop_event = asyncio.Event()
 
-    # Registrera signalhanterare när vi har en körande loop
+    # Register signal handlers when we have a running loop
     loop = asyncio.get_running_loop()
     _setup_signal_handlers_for_loop(loop, stop_event)
 
@@ -62,7 +62,7 @@ async def main() -> None:
         ) as client:
             while not stop_event.is_set():
                 await get_traffic_info(client)
-                # Vänta antingen tills stop_event sätts eller tills timeout (poll_interval)
+                # Wait either until stop_event is set or until timeout (poll_interval)
                 try:
                     await asyncio.wait_for(stop_event.wait(), timeout=poll_interval)
                 except asyncio.TimeoutError:
