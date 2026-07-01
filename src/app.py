@@ -5,8 +5,8 @@ import signal
 from pathlib import Path
 
 from dotenv import load_dotenv
-from spider_lcd import AsyncAPIClient
-from spider_lcd.exceptions import APIError
+from spider_api import AsyncAPIClient
+from spider_api.exceptions import APIError
 from lcd_display import LCDDisplay
 
 logging.basicConfig(filename='app.log', level=logging.INFO,

@@ -5,7 +5,7 @@
 ### 1. Step-by-step (traditional way)
 
 ```python
-from spider_lcd import APIClient
+from spider_api import APIClient
 
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
@@ -22,7 +22,7 @@ print(f"Line: {designation}, In: {nextDepartureIn}")
 ### 2. With dot notation directly from response (RECOMMENDED!)
 
 ```python
-from spider_lcd import APIClient
+from spider_api import APIClient
 
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
@@ -38,7 +38,7 @@ print(f"Line {designation} towards {direction}, in {nextDepartureIn}")
 ### 3. With get_nested utility function
 
 ```python
-from spider_lcd import APIClient, get_nested
+from spider_api import APIClient, get_nested
 
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
