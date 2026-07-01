@@ -98,5 +98,5 @@ first_stop = stops[0]["name"] if stops else "N/A"  # => "Stop 1"
 ## Tips
 
 - Always use a default value (second parameter) for safety
-- Dot notation fungerar endast för dict/object, inte för arrayer
-- För arrayer måste du hämta arrayen först och sedan indexera
+- Dot notation only works for dict/objects, not for arrays
+- For arrays, you must fetch the array first and then index it
