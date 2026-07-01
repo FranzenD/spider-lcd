@@ -42,12 +42,12 @@ class APIResponse:
         Returns:
             The value or default
         """
-        # Om nyckeln innehåller punkt, använd nästlad hämtning
+        # If the key contains a dot, use nested retrieval
         if "." in key:
             from .utils import get_nested
             return get_nested(self.data, key, default)
         
-        # Annars, enkel dictionary-åtkomst
+        # Otherwise, simple dictionary access
         return self.data.get(key, default)
     
     def has_key(self, key: str) -> bool:

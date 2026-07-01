@@ -1,8 +1,8 @@
-# Hämta Nästlad Data (Nested Data)
+# Fetching Nested Data
 
-## Tre sätt att hämta nästlad data
+## Three ways to fetch nested data
 
-### 1. Steg-för-steg (traditionellt sätt)
+### 1. Step-by-step (traditional way)
 
 ```python
 from spider_lcd import APIClient
@@ -10,16 +10,16 @@ from spider_lcd import APIClient
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
 
-# Hämta varje nivå separat
+# Fetch each level separately
 departure = response.get_data("departure", {})
 nextDepartureIn = departure.get("nextDepartureIn", "N/A")
 route = departure.get("route", {})
 designation = route.get("designation", "N/A")
 
-print(f"Linje: {designation}, Om: {nextDepartureIn}")
+print(f"Line: {designation}, In: {nextDepartureIn}")
 ```
 
-### 2. Med dot notation direkt från response (REKOMMENDERAT!)
+### 2. With dot notation directly from response (RECOMMENDED!)
 
 ```python
 from spider_lcd import APIClient
@@ -27,15 +27,15 @@ from spider_lcd import APIClient
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
 
-# Hämta direkt med punktnotation
+# Fetch directly with dot notation
 nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
 designation = response.get_data("departure.route.designation", "N/A")
 direction = response.get_data("departure.route.direction", "N/A")
 
-print(f"Linje {designation} mot {direction}, om {nextDepartureIn}")
+print(f"Line {designation} towards {direction}, in {nextDepartureIn}")
 ```
 
-### 3. Med get_nested utility-funktionen
+### 3. With get_nested utility function
 
 ```python
 from spider_lcd import APIClient, get_nested
@@ -43,17 +43,17 @@ from spider_lcd import APIClient, get_nested
 client = APIClient(base_url="http://localhost:3005/api")
 response = client.get("/traffic/gullmarsplan")
 
-# Använd get_nested direkt på response.data
+# Use get_nested directly on response.data
 data = response.data
 nextDepartureIn = get_nested(data, "departure.nextDepartureIn", "N/A")
 designation = get_nested(data, "departure.route.designation", "N/A")
 
-print(f"Linje {designation}, om {nextDepartureIn}")
+print(f"Line {designation}, in {nextDepartureIn}")
 ```
 
-## Exempel med JSON-struktur
+## Example with JSON structure
 
-Om ditt API returnerar:
+If your API returns:
 
 ```json
 {
@@ -71,32 +71,32 @@ Om ditt API returnerar:
 }
 ```
 
-Så kan du hämta data så här:
+Then you can fetch data like this:
 
 ```python
-# Enkla värden
+# Simple values
 time = response.get_data("departure.nextDepartureIn")  # => "5 min"
 line = response.get_data("departure.route.designation")  # => "144"
 direction = response.get_data("departure.route.direction")  # => "Gullmarsplan"
 
-# Om nyckeln inte finns, få default-värde
+# If the key doesn't exist, get default value
 missing = response.get_data("departure.missing.key", "N/A")  # => "N/A"
 
-# För arrayer, hämta först arrayen sen använd index
+# For arrays, fetch the array first then use index
 departure = response.get_data("departure", {})
 stops = departure.get("stops", [])
 first_stop = stops[0]["name"] if stops else "N/A"  # => "Stop 1"
 ```
 
-## Fördelar med dot notation
+## Advantages of dot notation
 
-✅ Kortare kod  
-✅ Lättare att läsa  
-✅ Automatisk hantering av saknade nycklar  
-✅ Inga KeyError om en nyckel saknas  
+✅ Shorter code  
+✅ Easier to read  
+✅ Automatic handling of missing keys  
+✅ No KeyError if a key is missing  
 
 ## Tips
 
-- Använd alltid ett default-värde (andra parametern) för säkerhet
+- Always use a default value (second parameter) for safety
 - Dot notation fungerar endast för dict/object, inte för arrayer
 - För arrayer måste du hämta arrayen först och sedan indexera
