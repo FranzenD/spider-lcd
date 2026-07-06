@@ -63,7 +63,7 @@ async def main() -> None:
 
     try:
         async with AsyncAPIClient(
-            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+            base_url=os.getenv("API_BASE_URL", "http://localhost:3001/api"),
             timeout=10
         ) as client:
             while not stop_event.is_set():
