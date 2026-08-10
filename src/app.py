@@ -32,8 +32,10 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
             logger.warning("Response was not successful for %s", direction)
     except APIError as e:
         logger.error("API Error: %s (Status: %s)", e, getattr(e, "status_code", "N/A"))
+        lcd.show("Ett fel inträffade", "Försöker igen...")
     except Exception:
         logger.exception("Unexpected error in get_traffic_info for direction %s", direction)
+        lcd.show("Ett fel inträffade", "Försöker igen...")
 
 def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event):
     try:
