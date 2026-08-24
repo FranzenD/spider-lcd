@@ -32,6 +32,12 @@ source "$VENV_DIR/bin/activate"
 echo "📦 Checking dependencies..."
 pip install -q -r "$SCRIPT_DIR/requirements.txt"
 
+# Check and kill existing instances of app.py
+if pgrep -f 'src/app.py' > /dev/null; then
+    echo "⚠️ Existing instance of app.py found. Terminating old process..."
+    pkill -f 'src/app.py'
+fi
+
 # Start app.py
 echo "🚀 Starting app..."
 echo ""
