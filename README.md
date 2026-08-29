@@ -55,8 +55,8 @@ cp .env.example .env    # Linux/Mac
 ### Basic Usage
 
 ```python
-from spider_lcd import APIClient
-from spider_lcd.exceptions import APIError
+from spider_api import APIClient
+from spider_api.exceptions import APIError
 
 # Create client
 client = APIClient(base_url="https://api.example.com")
@@ -126,7 +126,7 @@ response = client.get("/protected-endpoint")
 ```python
 import os
 from dotenv import load_dotenv
-from spider_lcd import APIClient
+from spider_api import APIClient
 
 # Load from .env file
 load_dotenv()
@@ -149,7 +149,7 @@ python example.py
 
 ```
 spider-lcd/
-├── src/spider_lcd/      # Main package
+├── src/spider_api/      # Main package
 │   ├── __init__.py      # Package exports
 │   ├── client.py        # API client
 │   ├── models.py        # Response model
@@ -195,7 +195,7 @@ APIClient(base_url: str, api_key: str = None, timeout: int = 30)
 ### Utility Functions
 
 ```python
-from spider_lcd.utils import get_nested, format_json
+from spider_api.utils import get_nested, format_json
 
 # Get nested value from dictionary
 value = get_nested(data, "user.address.city", default="N/A")

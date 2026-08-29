@@ -44,20 +44,24 @@ class LCDDisplay:
         if not _MODULES_AVAILABLE:
             return
 
-        mcp = self._connect_mcp()
-        if mcp is None:
-            logger.error(
-                "No I2C device found at 0x27 or 0x3F. "
-                "Check wiring and that I2C is enabled (raspi-config)."
-            )
-            return
+        try:
+            mcp = self._connect_mcp()
+            if mcp is None:
+                logger.error(
+                    "No I2C device found at 0x27 or 0x3F. "
+                    "Check wiring and that I2C is enabled (raspi-config)."
+                )
+                return
 
-        self._mcp = mcp
-        self._lcd = Adafruit_CharLCD(pin_rs=0, pin_e=2, pins_db=[4, 5, 6, 7], GPIO=mcp)
-        self._mcp.output(3, 1)  # turn on backlight
-        self._lcd.begin(16, 2)
-        self._available = True
-        logger.info("LCD1602 initialized.")
+            self._mcp = mcp
+            self._lcd = Adafruit_CharLCD(pin_rs=0, pin_e=2, pins_db=[4, 5, 6, 7], GPIO=mcp)
+            self._mcp.output(3, 1)  # turn on backlight
+            self._lcd.begin(16, 2)
+            self._available = True
+            logger.info("LCD1602 initialized.")
+        except Exception:
+            logger.exception("Failed to initialize LCD hardware. LCD output will be disabled.")
+            self._available = False
 
     def show(self, direction: str, next_departure_in: str) -> None:
         """Display departure information on the LCD.
