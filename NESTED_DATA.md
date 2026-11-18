@@ -7,8 +7,8 @@
 ```python
 from spider_lcd import APIClient
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Hämta varje nivå separat
 departure = response.get_data("departure", {})
@@ -24,8 +24,8 @@ print(f"Linje: {designation}, Om: {nextDepartureIn}")
 ```python
 from spider_lcd import APIClient
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Hämta direkt med punktnotation
 nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
@@ -40,8 +40,8 @@ print(f"Linje {designation} mot {direction}, om {nextDepartureIn}")
 ```python
 from spider_lcd import APIClient, get_nested
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Använd get_nested direkt på response.data
 data = response.data

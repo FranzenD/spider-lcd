@@ -38,9 +38,9 @@ python src/app.py
 ```
 
 Environment variables (`.env`):
-- `API_BASE_URL` – e.g. `http://localhost:3005/api`
-- `API_KEY` – optional Bearer token
-- `DIRECTION` – e.g. `gullmarsplan`
+- `API_BASE_URL` – e.g. `http://localhost:3001/api`
+
+The active stop and destination are configured in Spider API's `/traffic` admin view.
 
 ## Key Conventions
 

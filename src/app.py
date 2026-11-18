@@ -26,7 +26,7 @@ async def main():
     try:
         # Create async API client
         async with AsyncAPIClient(
-            base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+            base_url=os.getenv("API_BASE_URL", "http://localhost:3001/api"),
             timeout=10
         ) as client:
             while True:
@@ -37,32 +37,37 @@ async def main():
     finally:
         lcd.destroy()
 
-        
+
 async def get_traffic_info(client):
     """Get and display traffic information."""
     try:
-        # Make an async GET request
-        response = await client.get(f"/traffic/{os.getenv('DIRECTION', 'gullmarsplan')}")
-        
-        if response.success:
-            nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
-            designation = response.get_data("departure.route.designation", "N/A")
-            direction = response.get_data("departure.route.direction", "N/A")
-            
-            departure_label = nextDepartureIn if str(nextDepartureIn).strip().lower() == "nu" else f"Om: {nextDepartureIn}"
-            if args.verbose:
-                print(f"Linje: {designation}")
-                print(f"Mot: {direction}")
-                print(departure_label)
+        response = await client.get("/traffic")
+    except APIError as error:
+        lcd.clear()
+        if error.status_code == 409:
+            print("Spara en destination i Spider API:s adminvy.")
+        elif error.status_code == 404:
+            print("Inga kommande avgångar mot den sparade destinationen.")
+        else:
+            print(f"Fel vid hämtning av avgång: {error}")
+        return
 
-            lcd.show(direction, nextDepartureIn)
+    next_departure_in = response.get_data("departure.nextDepartureIn")
+    direction = response.get_data("departure.route.direction")
+    if not all(isinstance(value, str) and value.strip() for value in (direction, next_departure_in)):
+        lcd.clear()
+        print("Spider API returnerade ingen giltig avgång.")
+        return
 
-    except APIError as e:
-        print(f"Error: {e}")
-        if e.status_code:
-            print(f"Status Code: {e.status_code}")
-    
-   
+    if args.verbose:
+        designation = response.get_data("departure.route.designation", "N/A")
+        print(f"Linje: {designation}")
+        print(f"Mot: {direction}")
+        print(next_departure_in if next_departure_in.strip().lower() == "nu" else f"Om: {next_departure_in}")
+
+    lcd.show(direction, next_departure_in)
+
+
 if __name__ == "__main__":
     load_dotenv()
     asyncio.run(main())

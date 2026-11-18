@@ -2,6 +2,19 @@
 
 A simple Python client for making GET requests to APIs and handling JSON responses.
 
+## Run the traffic display
+
+1. In Spider API's `/traffic` admin view, select a stop and save a destination.
+2. Install the dependencies with `pip install -r requirements.txt`.
+3. If the backend is on another device or port, copy `.env.example` to `.env`
+   and set `API_BASE_URL` to the backend URL including `/api`.
+4. Run `python src/app.py`. Add `--verbose` to print departure details.
+
+The display reads `GET /api/traffic` every 30 seconds and follows the active
+stop and its saved destination. Remove `DIRECTION` from existing `.env` files.
+If a destination is missing or no upcoming departure is available, the display
+clears and checks again on the next poll.
+
 ## Features
 
 - 🚀 Simple and easy to use
@@ -132,11 +145,11 @@ from spider_lcd import APIClient
 load_dotenv()
 
 client = APIClient(
-    base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+    base_url=os.getenv("API_BASE_URL", "http://localhost:3001/api"),
     api_key=os.getenv("API_KEY")
 )
 
-response = client.get(f"/traffic/{os.getenv('DIRECTION', 'gullmarsplan')}")
+response = client.get("/traffic")
 ```
 
 ### Run the Example
