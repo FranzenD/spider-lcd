@@ -74,4 +74,4 @@ async with AsyncAPIClient(base_url=...) as client:
 If the server returns non-JSON, `data` is `{"raw_content": "<text>"}`.
 
 ### Language
-The codebase contains Swedish strings in user-facing output and some code comments. Keep this style for any new user-facing text.
+Write application log messages in English. Keep the existing Swedish style for LCD text.
