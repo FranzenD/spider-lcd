@@ -132,11 +132,11 @@ from spider_api import APIClient
 load_dotenv()
 
 client = APIClient(
-    base_url=os.getenv("API_BASE_URL", "http://localhost:3005/api"),
+    base_url=os.getenv("API_BASE_URL", "http://localhost:3001/api"),
     api_key=os.getenv("API_KEY")
 )
 
-response = client.get(f"/traffic/{os.getenv('DIRECTION', 'gullmarsplan')}")
+response = client.get("/traffic")
 ```
 
 ### Run the Example
