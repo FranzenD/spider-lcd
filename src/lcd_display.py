@@ -86,15 +86,19 @@ class LCDDisplay:
             direction: Destination direction shown on row 1 (truncated to 16 chars).
             next_departure_in: Departure time shown on row 2, e.g. "5 min".
         """
-        if not self._available:
-            return
-
         departure_label = (
             next_departure_in if next_departure_in.strip().lower() == "nu"
             else f"Om: {next_departure_in}"
         )
-        self._write_row(0, direction)
-        self._write_row(1, departure_label)
+        self.show_message(direction, departure_label)
+
+    def show_message(self, first_line: str, second_line: str) -> None:
+        """Display two lines of text without departure formatting."""
+        if not self._available:
+            return
+
+        self._write_row(0, first_line)
+        self._write_row(1, second_line)
 
     def _load_swedish_glyphs(self) -> None:
         """Program custom glyphs and restore the cursor to display memory."""
