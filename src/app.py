@@ -23,21 +23,21 @@ async def get_traffic_info(client: AsyncAPIClient) -> None:
             isinstance(value, str) and value.strip()
             for value in (route_direction, next_departure_in)
         ):
-            logger.warning("Spider API returnerade ingen giltig avgång.")
+            logger.warning("Spider API did not return a valid departure.")
             lcd.clear()
             return
 
         designation = response.get_data("departure.route.designation", "N/A")
-        logger.info("Linje: %s", designation)
-        logger.info("Mot: %s", route_direction)
-        logger.info("Om: %s", next_departure_in)
+        logger.info("Line: %s", designation)
+        logger.info("Destination: %s", route_direction)
+        logger.info("Departs in: %s", next_departure_in)
         lcd.show(route_direction, next_departure_in)
     except APIError as error:
         if error.status_code == 409:
-            logger.warning("Spara en destination i Spider API:s adminvy.")
+            logger.warning("Save a destination in the Spider API admin view.")
             lcd.clear()
         elif error.status_code == 404:
-            logger.info("Inga kommande avgångar mot den sparade destinationen.")
+            logger.info("No upcoming departures toward the saved destination.")
             lcd.clear()
         else:
             logger.error("API Error: %s (Status: %s)", error, error.status_code)
