@@ -38,9 +38,10 @@ python src/app.py
 ```
 
 Environment variables (`.env`):
-- `API_BASE_URL` – e.g. `http://localhost:3005/api`
-- `API_KEY` – optional Bearer token
-- `DIRECTION` – e.g. `gullmarsplan`
+- `API_BASE_URL` – e.g. `http://localhost:3001/api`
+- `POLL_INTERVAL` – seconds between polls, defaults to 30
+
+The active stop and destination are configured in Spider API's `/traffic` admin view.
 
 ## Key Conventions
 
@@ -73,4 +74,4 @@ async with AsyncAPIClient(base_url=...) as client:
 If the server returns non-JSON, `data` is `{"raw_content": "<text>"}`.
 
 ### Language
-The codebase contains Swedish strings in user-facing output and some code comments. Keep this style for any new user-facing text.
+Write application log messages in English. Keep the existing Swedish style for LCD text.

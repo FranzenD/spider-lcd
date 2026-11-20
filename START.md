@@ -16,12 +16,17 @@ This script will:
 You can create a `.env` file in the project root with the following variables:
 
 ```bash
-API_BASE_URL=http://localhost:3005/api  # API base address
+API_BASE_URL=http://localhost:3001/api  # API base address
 POLL_INTERVAL=30                         # How often app fetches data (seconds)
-DIRECTION=gullmarsplan                   # T-bank station name
 ```
 
 If you don't specify `.env`, the script uses default values.
+
+In Spider API's `/traffic` admin view, select a stop and save a destination.
+The LCD polls `GET /api/traffic` for the next departure toward that destination.
+Remove `DIRECTION` from existing LCD configuration and update `API_BASE_URL`
+if it still points to the old port. The LCD clears when a destination or an
+upcoming departure is unavailable and checks again at the next poll.
 
 ## Manual start
 
