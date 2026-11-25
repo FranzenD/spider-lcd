@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from spider_lcd import APIClient
+from spider_api import APIClient
 
 # Create a client
 client = APIClient(base_url="https://api.example.com")
