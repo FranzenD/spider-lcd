@@ -7,8 +7,8 @@
 ```python
 from spider_api import APIClient
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Fetch each level separately
 departure = response.get_data("departure", {})
@@ -24,8 +24,8 @@ print(f"Line: {designation}, In: {nextDepartureIn}")
 ```python
 from spider_api import APIClient
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Fetch directly with dot notation
 nextDepartureIn = response.get_data("departure.nextDepartureIn", "N/A")
@@ -40,8 +40,8 @@ print(f"Line {designation} towards {direction}, in {nextDepartureIn}")
 ```python
 from spider_api import APIClient, get_nested
 
-client = APIClient(base_url="http://localhost:3005/api")
-response = client.get("/traffic/gullmarsplan")
+client = APIClient(base_url="http://localhost:3001/api")
+response = client.get("/traffic")
 
 # Use get_nested directly on response.data
 data = response.data

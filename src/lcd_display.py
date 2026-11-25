@@ -1,11 +1,26 @@
 """LCD1602 display wrapper for showing departure information."""
 
 import logging
+import unicodedata
 from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 _LCD_MAX_COLS = 16
+
+# HD44780-compatible controllers have eight custom 5x8 glyph slots.
+# Use six of them so rendering does not depend on the controller's character ROM.
+_SWEDISH_GLYPHS = {
+    "å": (0x04, 0x0A, 0x04, 0x0E, 0x01, 0x0F, 0x11, 0x0F),
+    "ä": (0x0A, 0x00, 0x0E, 0x01, 0x0F, 0x11, 0x0F, 0x00),
+    "ö": (0x0A, 0x00, 0x0E, 0x11, 0x11, 0x11, 0x0E, 0x00),
+    "Å": (0x04, 0x0A, 0x04, 0x0E, 0x11, 0x1F, 0x11, 0x11),
+    "Ä": (0x0A, 0x00, 0x0E, 0x11, 0x1F, 0x11, 0x11, 0x00),
+    "Ö": (0x0A, 0x00, 0x0E, 0x11, 0x11, 0x11, 0x11, 0x0E),
+}
+_SWEDISH_CHARACTERS = str.maketrans({
+    letter: index for index, letter in enumerate(_SWEDISH_GLYPHS)
+})
 
 try:
     from PCF8574 import PCF8574_GPIO
@@ -57,6 +72,7 @@ class LCDDisplay:
             self._lcd = Adafruit_CharLCD(pin_rs=0, pin_e=2, pins_db=[4, 5, 6, 7], GPIO=mcp)
             self._mcp.output(3, 1)  # turn on backlight
             self._lcd.begin(16, 2)
+            self._load_swedish_glyphs()
             self._available = True
             logger.info("LCD1602 initialized.")
         except Exception:
@@ -70,17 +86,32 @@ class LCDDisplay:
             direction: Destination direction shown on row 1 (truncated to 16 chars).
             next_departure_in: Departure time shown on row 2, e.g. "5 min".
         """
+        departure_label = (
+            next_departure_in if next_departure_in.strip().lower() == "nu"
+            else f"Om: {next_departure_in}"
+        )
+        self.show_message(direction, departure_label)
+
+    def show_message(self, first_line: str, second_line: str) -> None:
+        """Display two lines of text without departure formatting."""
         if not self._available:
             return
 
-        row1 = direction[:_LCD_MAX_COLS]
-        row2 = (next_departure_in if next_departure_in.strip().lower() == "nu"
-                else f"Om: {next_departure_in}")[:_LCD_MAX_COLS]
+        self._write_row(0, first_line)
+        self._write_row(1, second_line)
 
+    def _load_swedish_glyphs(self) -> None:
+        """Program custom glyphs and restore the cursor to display memory."""
+        for index, bitmap in enumerate(_SWEDISH_GLYPHS.values()):
+            self._lcd.write4bits(self._lcd.LCD_SETCGRAMADDR | (index * 8))
+            for pixel_row in bitmap:
+                self._lcd.write4bits(pixel_row, True)
         self._lcd.setCursor(0, 0)
-        self._lcd.message(row1.ljust(_LCD_MAX_COLS))
-        self._lcd.setCursor(0, 1)
-        self._lcd.message(row2.ljust(_LCD_MAX_COLS))
+
+    def _write_row(self, row: int, text: str) -> None:
+        text = unicodedata.normalize("NFC", text).translate(_SWEDISH_CHARACTERS)
+        self._lcd.setCursor(0, row)
+        self._lcd.message(text[:_LCD_MAX_COLS].ljust(_LCD_MAX_COLS))
 
     def clear(self) -> None:
         """Clear the LCD screen."""

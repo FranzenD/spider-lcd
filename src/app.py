@@ -15,27 +15,37 @@ logger = logging.getLogger(__name__)
 lcd = LCDDisplay()
 
 async def get_traffic_info(client: AsyncAPIClient) -> None:
-    direction = os.getenv("DIRECTION", "gullmarsplan")
     try:
-        response = await client.get(f"/traffic/{direction}")
-        if response.success:
-            designation = response.get_data("departure.route.designation", "N/A")
-            route_direction = response.get_data("departure.route.direction", "N/A")
-            next_departure_in = response.get_data("departure.nextDepartureIn", "N/A")
+        response = await client.get("/traffic")
+        route_direction = response.get_data("departure.route.direction")
+        next_departure_in = response.get_data("departure.nextDepartureIn")
+        if not all(
+            isinstance(value, str) and value.strip()
+            for value in (route_direction, next_departure_in)
+        ):
+            logger.warning("Spider API did not return a valid departure.")
+            lcd.clear()
+            return
 
-            logger.info("Linje: %s", designation)
-            logger.info("Mot: %s", route_direction)
-            logger.info("Om: %s", next_departure_in)
-
-            lcd.show(route_direction, next_departure_in)
+        designation = response.get_data("departure.route.designation", "N/A")
+        logger.info("Line: %s", designation)
+        logger.info("Destination: %s", route_direction)
+        logger.info("Departs in: %s", next_departure_in)
+        lcd.show(route_direction, next_departure_in)
+    except APIError as error:
+        if error.status_code == 409:
+            logger.warning("Save a destination in the Spider API admin view.")
+            lcd.clear()
+        elif error.status_code == 404:
+            logger.info("No upcoming departures toward the saved destination.")
+            lcd.clear()
         else:
-            logger.warning("Response was not successful for %s", direction)
-    except APIError as e:
-        logger.error("API Error: %s (Status: %s)", e, getattr(e, "status_code", "N/A"))
-        lcd.show("Ett fel inträffade", "Försöker igen...")
+            logger.error("API Error: %s (Status: %s)", error, error.status_code)
+            lcd.show_message("Ett fel uppstod", "Försöker igen...")
     except Exception:
-        logger.exception("Unexpected error in get_traffic_info for direction %s", direction)
-        lcd.show("Ett fel inträffade", "Försöker igen...")
+        logger.exception("Unexpected error in get_traffic_info")
+        lcd.show_message("Ett fel uppstod", "Försöker igen...")
+
 
 def _setup_signal_handlers_for_loop(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event):
     try:
